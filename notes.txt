@@ -1,0 +1,18 @@
+Fri, July 11
+------------
+
+-start high time 2ms
+-low 840us (probably not important)
+-high 1 ms
+-low
+-high for 440us
+-low-
+high 1ms
+
+LH = long high = 1ms
+SH = short high = 500us
+
+
+Start(2ms), LH, SH, LH,SH,Lh,SH,SH,Sh,SH,Sh,Sh,Lh,Lh,Sh,Sh,done(just goes low)
+
+using 150 ohm resistor to drive it
