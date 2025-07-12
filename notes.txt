@@ -16,3 +16,19 @@ SH = short high = 500us
 Start(2ms), LH, SH, LH,SH,Lh,SH,SH,Sh,SH,Sh,Sh,Lh,Lh,Sh,Sh,done(just goes low)
 
 using 150 ohm resistor to drive it
+
+Saturday july 12:
+-Did not need 150 ohm resistor,
+
+on state requires toggling led at 40khz
+
+-change high and low to those seen in the website
+
+-1 is 1200microseconds on 600 microseconds off
+-0 is 600 on 600 off
+
+
+Source sites:
+https://www.sbprojects.net/knowledge/ir/sirc.php
+
+https://www.righto.com/2010/03/understanding-sony-ir-remote-codes-lirc.html
