@@ -1,5 +1,13 @@
 #include <Arduino.h>
 #define irLED 16 //irLED on pin 2
+#include "BluetoothSerial.h" //for bluetooth connectivity
+
+#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
+#error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
+#endif
+
+BluetoothSerial SerialBT;
+
 
 //vars
 unsigned long delayStart = 0;
@@ -48,8 +56,7 @@ void zero(){
 
 void on(){
 
-  int data = 0b10101000000110;
-
+  int data = 0b101010000001100;
   start();
 
   one();
@@ -76,10 +83,34 @@ void on(){
 void setup() {
   // put your setup code here, to run once:
   pinMode(irLED,OUTPUT);
+  Serial.begin(115200);
+
+  //bluetooth setup
+  SerialBT.begin("ESP32 Testing");
+  Serial.println("Bluetooth started");
+  SerialBT.println("Test line");
+
 }
 
 void loop() {
-  on();
-  delay(20);//20ms delay before retrying
+
+  if(SerialBT.available()){//if we recieve stuff from the bluetooth device
+    char x = SerialBT.read();
+    if(x == 'O'){
+      int i = 50;
+      while (i > 0)
+      {
+        on();
+        delay(20);
+        i--;
+      }
+      SerialBT.println("Turned On/Off");
+    }else if (x != '\n'){
+      SerialBT.println("Invalid operation");
+    }
+  }
+
+  //on();
+  //delay(20);//20ms delay before retrying
 }
 
