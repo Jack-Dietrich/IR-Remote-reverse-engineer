@@ -31,30 +31,45 @@ void SH(){
 }
 
 void start(){
-  high(2000);
-  delayMicroseconds(500);
+  high(2400);//2400 microseconds on 
+  delayMicroseconds(600); //600 microseconds off
 
 }
 
+void one(){
+  high(1200);
+  delayMicroseconds(600);
+}
 
+void zero(){
+  high(600);
+  delayMicroseconds(600);
+}
 
 void on(){
+
+  int data = 0b10101000000110;
+
   start();
-  LH();
-  SH();
-  LH();
-  SH();
-  LH();
-  SH();
-  SH();
-  SH();
-  SH();
-  SH();
-  SH();
-  LH();
-  LH();
-  SH();
-  SH();
+
+  one();
+  zero();
+  one();
+  zero();
+  one();
+  zero();
+  zero();
+  zero();
+  zero();
+  zero();
+  zero();
+  one();
+  one();
+  zero();
+  zero();
+
+
+
 
 };
 

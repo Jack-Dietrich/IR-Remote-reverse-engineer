@@ -27,6 +27,12 @@ on state requires toggling led at 40khz
 -1 is 1200microseconds on 600 microseconds off
 -0 is 600 on 600 off
 
+-Actual remote vpp of 40khz carrier signal:180mv
+
+code:header.10101000000110
+
+-using 15 bit version of the sony protocol
+
 
 Source sites:
 https://www.sbprojects.net/knowledge/ir/sirc.php
