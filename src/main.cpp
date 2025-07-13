@@ -11,6 +11,28 @@ BluetoothSerial SerialBT;
 
 //vars
 unsigned long delayStart = 0;
+bool on = false;
+bool connectMessage = false;
+
+//array of commands
+enum commands {
+  POWER = 0b101010000001100,
+  //inputs
+  SAT = 0b110000000001101,
+  SACD = 0b101001000001100,
+  BDDVD = 0b01101000000100010100,  //too long
+  GAME = 0b00111100001100,
+  USB = 0b11101000000100010100, //too long
+  TV = 0b010101100001100,
+
+  //commands
+  VUP = 0b010010000001100, //volume up
+  VDOWN = 0b110010000001100, //volume down
+  PAUSE = 0b01011100000100010000, //pause
+  NEXT = 0b10001100000100010000, //next
+  PREV = 0b00001100000100010000,//prev
+
+};
 
 
 // put function declarations here:
@@ -26,22 +48,12 @@ void high(int onTime){ //ontime is microseconds
 } 
 
 
-void LH(){//long high function
-  high(1000);
-  delayMicroseconds(500);
-}
 
-void SH(){
-  high(500);
 
-  delayMicroseconds(500);
-
-}
 
 void start(){
   high(2400);//2400 microseconds on 
   delayMicroseconds(600); //600 microseconds off
-
 }
 
 void one(){
@@ -54,31 +66,56 @@ void zero(){
   delayMicroseconds(600);
 }
 
-void on(){
-
-  int data = 0b101010000001100;
-  start();
-
-  one();
-  zero();
-  one();
-  zero();
-  one();
-  zero();
-  zero();
-  zero();
-  zero();
-  zero();
-  zero();
-  one();
-  one();
-  zero();
-  zero();
+void sendMenu(){
+  SerialBT.println();
+  SerialBT.println("----Sony Reciever Bluetooth Menu----");
+  Serial.print("\033[31m"); // Red text
+  SerialBT.println("-- Functions --");
+  SerialBT.println("O - Turn receiver on/off");
+  SerialBT.println("? - Check receiver power status");
+  Serial.print("\033[0m"); // Reset color
+  SerialBT.println("M - Request this menu be printed again");
+  SerialBT.println("-- Inputs --");
+  SerialBT.println("B - BD/DVD    G - Game     U - USB");
+  SerialBT.println("S - Sat/Catv  C - SA-CD/CD T - TV");
+  SerialBT.println();
+}
 
 
 
+void send(int command){
+
+
+  //uint16_t data = 0b101010000001100;
+  start(); //send start to IR reciever
+
+  //transmit the menu for easy access
+
+
+  for(int i = 14; i >= 0; i-- ){
+    bool result = command & (1 << i);
+    if(result){
+      one();
+      Serial.println("one");
+    }else{
+      zero();
+      Serial.println("zero");
+    }
+  }
 
 };
+
+
+int sendCommand(int command){
+  int i = 50;
+  while (i > 0)
+    {
+      send(command);
+      delay(20);
+      i--;
+    }
+  return 1;
+}
 
 void setup() {
   // put your setup code here, to run once:
@@ -90,27 +127,59 @@ void setup() {
   Serial.println("Bluetooth started");
   SerialBT.println("Test line");
 
+
 }
 
 void loop() {
 
+  if(SerialBT.connected() && connectMessage == false){
+    sendMenu();
+    connectMessage = true;
+  }
+
   if(SerialBT.available()){//if we recieve stuff from the bluetooth device
     char x = SerialBT.read();
     if(x == 'O'){
-      int i = 50;
-      while (i > 0)
-      {
-        on();
-        delay(20);
-        i--;
-      }
+      sendCommand(POWER);
       SerialBT.println("Turned On/Off");
-    }else if (x != '\n'){
+      on ^= 1;//exclusive or to toggle on
+    }if(x == 'B'){
+      sendCommand(BDDVD);
+      SerialBT.println("Input: BD/DVD");
+    }if(x == 'G'){
+      sendCommand(GAME);
+      SerialBT.println("Input: Game");      
+    }if(x == 'U'){
+      sendCommand(USB);
+      SerialBT.println("Input: USB");     
+    }if(x == 'S'){
+      sendCommand(SAT);
+      SerialBT.println("Input: SAT/CATV");     
+    }if(x == 'C'){
+      sendCommand(SACD);
+      SerialBT.println("Input: CD");           
+    }if(x == 'T'){
+      sendCommand(TV);
+      SerialBT.println("Input: TV");     
+    }if(x == '?'){
+      if(on){
+        SerialBT.println("Receiver is ON");
+      }else{
+        SerialBT.println("Receiver is OFF");
+      }
+    }if(x == 'M'){
+      sendMenu();
+    }
+    
+    
+    else if (x != '\n'){
       SerialBT.println("Invalid operation");
     }
+  
+
+
+  
   }
 
-  //on();
-  //delay(20);//20ms delay before retrying
 }
 
